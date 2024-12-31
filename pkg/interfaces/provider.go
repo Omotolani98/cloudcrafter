@@ -9,4 +9,5 @@ type Provider interface {
 	CreateResource(resource models.Resource) (*models.ResourceMetadata, error)
 	DeleteResource(resourceID string) error
 	GetResource(resourceID string) (*models.ResourceMetadata, error)
+	ListResources() ([]models.ResourceMetadata, error) // Add ListResources here
 }
