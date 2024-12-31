@@ -37,7 +37,7 @@ brews:
     license: "MIT"  # or your actual license
     repository:
       owner: Omotolani98
-      name: cloudcrafter
+      name: homebrew-cloudcrafter
       branch: main  # optional, defaults to master
     test: |
       system "#{bin}/cloudcrafter --version"
