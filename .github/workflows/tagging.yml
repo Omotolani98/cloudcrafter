@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
 jobs:
   auto-tag:
     name: Auto Tag
@@ -13,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up Git
         run: |
@@ -27,11 +31,11 @@ jobs:
           minor=$(echo $latest | cut -d. -f2)
           patch=$(echo $latest | cut -d. -f3)
           next_version="v$major.$minor.$((patch + 1))"
-          echo "version=$next_version" >> $GITHUB_ENV
+          echo "next_version=$next_version" >> "$GITHUB_OUTPUT"
 
       - name: Create and Push Tag
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          git tag ${{ steps.version.outputs.version }}
-          git push https://$PAT_TOKEN@github.com/Omotolani98/cloudcrafter.git ${{ steps.version.outputs.version }}
+          git tag ${{ steps.version.outputs.next_version }}
+          git push origin ${{ steps.version.outputs.next_version }}
