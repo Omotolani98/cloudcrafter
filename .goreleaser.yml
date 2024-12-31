@@ -34,11 +34,11 @@ brews:
   - name: cloudcrafter
     description: "CLI for multi-cloud provisioning and resource management"
     homepage: "https://github.com/Omotolani98/cloudcrafter"
-    license: "MIT"  # or your actual license
+    license: "MIT"
     repository:
       owner: Omotolani98
       name: homebrew-cloudcrafter
-      branch: main  # optional, defaults to master
+      branch: main
     test: |
       system "#{bin}/cloudcrafter --version"
     install: |
