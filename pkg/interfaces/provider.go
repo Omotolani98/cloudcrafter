@@ -1,6 +1,6 @@
 package providers
 
-import "multicloud-provisioner/pkg/models"
+import "cloudcrafter/pkg/models"
 
 // import "multi-cloud-provisioner/pkg/models"
 
