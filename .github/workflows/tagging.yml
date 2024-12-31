@@ -30,6 +30,8 @@ jobs:
           echo "version=$next_version" >> $GITHUB_ENV
 
       - name: Create and Push Tag
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git tag ${{ steps.version.outputs.version }}
-          git push origin ${{ steps.version.outputs.version }}
+          git push https://$PAT_TOKEN@github.com/Omotolani98/cloudcrafter.git ${{ steps.version.outputs.version }}
