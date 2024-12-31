@@ -1,9 +1,9 @@
 package providers
 
 import (
+	"cloudcrafter/pkg/models"
 	"errors"
 	"fmt"
-	"multicloud-provisioner/pkg/models"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"

@@ -1,9 +1,9 @@
 package services
 
 import (
+	"cloudcrafter/pkg/models"
+	"cloudcrafter/pkg/providers"
 	"fmt"
-	"multicloud-provisioner/pkg/models"
-	"multicloud-provisioner/pkg/providers"
 )
 
 // ProvisioningService handles business logic for resource provisioning

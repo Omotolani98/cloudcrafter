@@ -1,8 +1,8 @@
 package providers
 
 import (
+	providers "cloudcrafter/pkg/interfaces"
 	"fmt"
-	providers "multicloud-provisioner/pkg/interfaces"
 )
 
 type ProviderRegistry struct {

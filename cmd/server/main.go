@@ -1,12 +1,12 @@
 package main
 
 import (
+	"cloudcrafter/internal/db"
+	"cloudcrafter/pkg/handlers"
+	"cloudcrafter/pkg/providers"
+	"cloudcrafter/pkg/services"
+	"cloudcrafter/routes"
 	"log"
-	"multicloud-provisioner/internal/db"
-	"multicloud-provisioner/pkg/handlers"
-	"multicloud-provisioner/pkg/providers"
-	"multicloud-provisioner/pkg/services"
-	"multicloud-provisioner/routes"
 	"os"
 	"os/signal"
 	"syscall"
