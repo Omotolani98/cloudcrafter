@@ -1,13 +1,16 @@
 package providers
 
 import (
+	"cloudcrafter/pkg/logger"
 	"cloudcrafter/pkg/models"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"go.uber.org/zap"
 )
 
 type AWSProvider struct {
@@ -93,4 +96,53 @@ func (p *AWSProvider) GetResource(resourceID string) (*models.ResourceMetadata, 
 		Status:    *instance.State.Name,
 		CreatedAt: *instance.LaunchTime,
 	}, nil
+}
+
+func (p *AWSProvider) ListResources() ([]models.ResourceMetadata, error) {
+	logger.Log.Info("Listing resources for AWS provider")
+
+	input := &ec2.DescribeInstancesInput{}
+	result, err := p.ec2Client.DescribeInstances(input)
+	if err != nil {
+		logger.Log.Error("Failed to list instances", zap.Error(err))
+		return nil, fmt.Errorf("failed to list instances: %v", err)
+	}
+
+	var resources []models.ResourceMetadata
+	for _, reservation := range result.Reservations {
+		for _, instance := range reservation.Instances {
+			var name string
+			for _, tag := range instance.Tags {
+				if *tag.Key == "Name" {
+					name = *tag.Value
+					break
+				}
+			}
+
+			resource := models.ResourceMetadata{
+				ID:        *instance.InstanceId,
+				Name:      name,
+				Type:      "vm",
+				Provider:  "aws",
+				Region:    *instance.Placement.AvailabilityZone,
+				Status:    *instance.State.Name,
+				CreatedAt: *instance.LaunchTime,
+				UpdatedAt: time.Now(),
+			}
+			logger.Log.Info("Resource discovered",
+				zap.String("id", resource.ID),
+				zap.String("name", resource.Name),
+				zap.String("status", resource.Status),
+			)
+			resources = append(resources, resource)
+		}
+	}
+
+	if len(resources) == 0 {
+		logger.Log.Warn("No resources found")
+		return nil, fmt.Errorf("no resources found in the region")
+	}
+
+	logger.Log.Info("Resources listed successfully", zap.Int("count", len(resources)))
+	return resources, nil
 }
