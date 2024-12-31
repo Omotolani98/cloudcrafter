@@ -34,6 +34,9 @@ brews:
   - name: cloudcrafter
     description: "CLI for multi-cloud provisioning and resource management"
     homepage: "https://your-website.com"
+    tap:
+      owner: Omotolani98
+      name: cloudcrafter
     install: |
       bin.install "cloudcrafter"
     caveats: |
