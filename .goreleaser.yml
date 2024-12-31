@@ -1,0 +1,41 @@
+version: 2
+
+project_name: cloudcrafter
+
+builds:
+  - id: cloudcrafter
+    main: ./cmd/cli/cli.go
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    binary: cloudcrafter
+    env:
+      - CGO_ENABLED=0
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    files:
+      - LICENSE
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: Omotolani98
+    name: cloudcrafter
+
+brews:
+  - name: cloudcrafter
+    description: "CLI for multi-cloud provisioning and resource management"
+    homepage: "https://your-website.com"
+    install: |
+      bin.install "cloudcrafter"
+    caveats: |
+      To use CloudCrafter CLI, add it to your PATH.
+      Example: export PATH="$PATH:/usr/local/bin/cloudcrafter"

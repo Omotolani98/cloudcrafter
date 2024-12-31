@@ -76,3 +76,17 @@ func (s *ProvisioningService) GetResource(providerName, resourceID string) (*mod
 
 	return resourceMetadata, nil
 }
+
+func (s *ProvisioningService) ListResources(providerName string) ([]models.ResourceMetadata, error) {
+	provider, err := s.providerRegistry.Get(providerName)
+	if err != nil {
+		return nil, fmt.Errorf("provider %s not found: %w", providerName, err)
+	}
+
+	resourceMetadata, err := provider.ListResources()
+	if err != nil {
+		return nil, fmt.Errorf("error listing resources for provider %s: %w", providerName, err)
+	}
+
+	return resourceMetadata, nil
+}

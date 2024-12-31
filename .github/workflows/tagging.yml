@@ -1,0 +1,35 @@
+name: Auto Tagging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  auto-tag:
+    name: Auto Tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Determine Next Version
+        id: version
+        run: |
+          latest=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          major=$(echo $latest | cut -d. -f1 | tr -d 'v')
+          minor=$(echo $latest | cut -d. -f2)
+          patch=$(echo $latest | cut -d. -f3)
+          next_version="v$major.$minor.$((patch + 1))"
+          echo "version=$next_version" >> $GITHUB_ENV
+
+      - name: Create and Push Tag
+        run: |
+          git tag ${{ env.version }}
+          git push origin ${{ env.version }}
