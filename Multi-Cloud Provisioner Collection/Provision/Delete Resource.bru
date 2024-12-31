@@ -1,0 +1,15 @@
+meta {
+  name: Delete Resource
+  type: http
+  seq: 2
+}
+
+delete {
+  url: http://localhost:5060/resources/aws/i-0abc12345def67890
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}

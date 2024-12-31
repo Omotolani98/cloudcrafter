@@ -1,0 +1,30 @@
+meta {
+  name: Create Resource
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:7070/resources
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "provider": "aws",
+    "resources": [
+      {
+        "type": "vm",
+        "name": "test-instance",
+        "machineType": "t2.micro",
+        "region": "us-east-1",
+        "image": "ami-0abcdef1234567890"
+      }
+    ]
+  }
+}
