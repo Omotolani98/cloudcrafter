@@ -1,6 +1,6 @@
-# **Multi-Cloud Provisioner**
+# **CloudCrafter**
 
-Multi-Cloud Provisioner is a lightweight tool designed for DevOps engineers to manage cloud infrastructure across AWS, Azure, and GCP. It leverages existing CLI configurations to authenticate with cloud providers, eliminating the need to manage credentials within the tool.
+CloudCrafter is a lightweight tool designed for DevOps engineers to manage cloud infrastructure across AWS, Azure, and GCP. It leverages existing CLI configurations to authenticate with cloud providers, eliminating the need to manage credentials within the tool.
 
 ---
 
@@ -54,7 +54,7 @@ Before using this tool, ensure the following CLI tools are installed and configu
 ### **1. Clone the Repository**
 ```bash
 git clone <repository-url>
-cd multi-cloud-provisioner
+cd cloudcrafter
 ```
 
 ### **2. Install Dependencies**
