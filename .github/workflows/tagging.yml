@@ -31,5 +31,5 @@ jobs:
 
       - name: Create and Push Tag
         run: |
-          git tag ${{ env.version }}
-          git push origin ${{ env.version }}
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
