@@ -3,11 +3,16 @@ name: Release Automation
 on:
   push:
     tags:
-      - 'v*' # Trigger on version tags like v1.0.0
+      - 'v*' # Trigger when tags are manually pushed
+  workflow_run:
+    workflows:
+      - Auto Tagging # Name of the tagging workflow
+    types:
+      - completed
 
 permissions:
   contents: write
-  
+
 jobs:
   tag-build-release:
     name: Build and Release
@@ -28,14 +33,5 @@ jobs:
         run: |
           make build
           make release
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            release/*
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
