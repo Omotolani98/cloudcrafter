@@ -1,0 +1,32 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: multi-cloud-provisioner
+    ports:
+      - "${PORT}:${PORT}" # Map the container port to the host port dynamically
+    env_file:
+      - .env # Load environment variables from .env file
+    depends_on:
+      - db
+    restart: unless-stopped
+    volumes:
+      - .:/app # Mount current directory for development (optional, remove in production)
+
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    ports:
+      - "5432:5432" # Database port mapping
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
