@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"multicloud-provisioner/pkg/handlers"
+	"cloudcrafter/pkg/handlers"
 
 	"github.com/gin-gonic/gin"
 )

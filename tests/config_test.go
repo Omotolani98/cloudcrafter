@@ -1,8 +1,8 @@
 package test
 
 import (
+	"cloudcrafter/pkg/models"
 	"encoding/json"
-	"multicloud-provisioner/pkg/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

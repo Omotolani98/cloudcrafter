@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"multicloud-provisioner/pkg/models"
-	"multicloud-provisioner/pkg/services"
+	"cloudcrafter/pkg/models"
+	"cloudcrafter/pkg/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
