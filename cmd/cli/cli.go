@@ -21,6 +21,7 @@ func main() {
 		Usage: "Provision and manage cloud resources across multiple providers",
 		Commands: []*cli.Command{
 			commands.ProvisionCommand(),
+			commands.GenerateYAMLCommand(),
 			commands.ListCommand(),
 			commands.DeleteCommand(),
 		},

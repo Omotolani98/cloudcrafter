@@ -19,7 +19,7 @@ func NewProvisioningService(providerRegistry *providers.ProviderRegistry) *Provi
 }
 
 // CreateResource provisions a new resource using the appropriate provider
-func (s *ProvisioningService) CreateResource(config models.Configuration) ([]*models.ResourceMetadata, error) {
+func (s *ProvisioningService) CreateResource(config *models.Configuration) ([]*models.ResourceMetadata, error) {
 	// Validate the entire configuration
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid configuration: %w", err)
