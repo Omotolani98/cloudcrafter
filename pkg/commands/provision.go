@@ -1,71 +1,91 @@
 package commands
 
 import (
-	"cloudcrafter/pkg/logger"
 	"cloudcrafter/pkg/providers"
 	"cloudcrafter/pkg/services"
 	"cloudcrafter/pkg/utils"
 	"fmt"
-
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 )
 
+// ProvisionCommand returns the CLI command for provisioning
 func ProvisionCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "provision",
-		Usage: "Provision resources using a YAML file",
+		Usage: "Provision resources (YAML-based or interactive)",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "file",
-				Aliases:  []string{"f"},
-				Usage:    "Path to the YAML configuration file",
-				Required: true,
+				Name:  "file",
+				Usage: "Path to the YAML configuration file",
+			},
+			&cli.StringFlag{
+				Name:  "provider",
+				Usage: "Provider to use",
 			},
 		},
 		Action: func(c *cli.Context) error {
-			filePath := c.String("file")
+			file := c.String("file")
+			provider := c.String("provider")
 
-			logger.Log.Info("Executing 'provision' command", zap.String("file", filePath))
-
-			// Parse the YAML file
-			config, err := utils.ParseYAMLConfig(filePath)
-			if err != nil {
-				logger.Log.Error("Error parsing YAML file", zap.Error(err))
-				return fmt.Errorf("error parsing YAML file: %w", err)
+			if file != "" {
+				return provisionFromYAML(file, provider)
 			}
-
-			logger.Log.Info("YAML file parsed successfully", zap.String("provider", config.Provider))
-
-			// Initialize ProviderRegistry based on the provider context in the YAML
-			providerRegistry, err := providers.InitializeRegistry(config.Provider)
-			if err != nil {
-				logger.Log.Error("Error initializing provider registry", zap.Error(err))
-				return fmt.Errorf("error initializing provider registry: %w", err)
-			}
-
-			// Initialize Provisioning Service
-			provisioningService := services.NewProvisioningService(providerRegistry)
-
-			// Provision resources
-			provisionedResources, err := provisioningService.CreateResource(*config)
-			if err != nil {
-				logger.Log.Error("Error provisioning resources", zap.Error(err))
-				return fmt.Errorf("error provisioning resources: %w", err)
-			}
-
-			logger.Log.Info("Resources provisioned successfully",
-				zap.String("provider", config.Provider),
-				zap.Int("count", len(provisionedResources)),
-			)
-
-			fmt.Println("Successfully provisioned the following resources:")
-			for _, resource := range provisionedResources {
-				fmt.Printf("ID: %s, Name: %s, Type: %s, Region: %s\n",
-					resource.ID, resource.Name, resource.Type, resource.Region)
-			}
-
-			return nil
+			return provisionInteractive()
 		},
 	}
+}
+
+// YAML-based provisioning
+func provisionFromYAML(filePath string, providerName string) error {
+	config, err := utils.ParseYAML(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to parse YAML: %v", err)
+	}
+
+	providerRegistry, err := providers.InitializeRegistry(providerName)
+	if err != nil {
+		return fmt.Errorf("failed to initialize provider registry: %v", err)
+	}
+
+	provisionService := services.NewProvisioningService(providerRegistry)
+	metadata, err := provisionService.CreateResource(config)
+	if err != nil {
+		return fmt.Errorf("failed to provision resource: %v", err)
+	}
+	//provider, err := providers.NewAWSProvider(config.Provider)
+	//if err != nil {
+	//	return fmt.Errorf("failed to initialize AWS provider: %v", err)
+	//}
+	//
+	//for _, resource := range config.Resources {
+	//	metadata, err := provider.CreateResource(resource)
+	//	if err != nil {
+	//		return fmt.Errorf("failed to provision resource %s: %v", resource.Name, err)
+	//	}
+	//	fmt.Printf("Provisioned resource: %+v\n", metadata)
+	//}
+
+	fmt.Printf("Provisioned resource: %+v\n", metadata)
+
+	return nil
+}
+
+// Interactive provisioning
+func provisionInteractive() error {
+	resource, err := utils.CollectInteractiveResourceData()
+	if err != nil {
+		return err
+	}
+
+	provider, err := providers.NewAWSProvider(resource.Region)
+	if err != nil {
+		fmt.Printf("Failed to initialize AWS provider: %v\n", err)
+	}
+	metadata, err := provider.CreateResource(resource)
+	if err != nil {
+		return fmt.Errorf("failed to provision resource interactively: %v", err)
+	}
+	fmt.Printf("Provisioned resource: %+v\n", metadata)
+
+	return nil
 }

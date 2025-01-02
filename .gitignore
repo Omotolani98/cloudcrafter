@@ -27,3 +27,5 @@ go.work.sum
 dist/
 
 cloudcrafter
+
+.idea

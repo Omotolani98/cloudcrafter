@@ -3,7 +3,6 @@ package providers
 import (
 	"cloudcrafter/pkg/logger"
 	"cloudcrafter/pkg/models"
-	"errors"
 	"fmt"
 	"time"
 
@@ -32,33 +31,82 @@ func NewAWSProvider(region string) (*AWSProvider, error) {
 }
 
 // CreateResource creates a resource on AWS
+//func (p *AWSProvider) CreateResource(resource models.Resource) (*models.ResourceMetadata, error) {
+//	if resource.Type != "vm" {
+//		return nil, errors.New("unsupported resource type for AWS")
+//	}
+//
+//	input := &ec2.RunInstancesInput{
+//		ImageId:      aws.String(resource.Image),
+//		InstanceType: aws.String(resource.MachineType),
+//		MinCount:     aws.Int64(1),
+//		MaxCount:     aws.Int64(1),
+//	}
+//
+//	result, err := p.ec2Client.RunInstances(input)
+//	if err != nil {
+//		return nil, fmt.Errorf("failed to create instance: %v", err)
+//	}
+//
+//	instance := result.Instances[0]
+//	return &models.ResourceMetadata{
+//		ID:        *instance.InstanceId,
+//		Name:      resource.Name,
+//		Type:      resource.Type,
+//		Provider:  "aws",
+//		Region:    resource.Region,
+//		Status:    *instance.State.Name,
+//		CreatedAt: *instance.LaunchTime,
+//	}, nil
+//}
+
 func (p *AWSProvider) CreateResource(resource models.Resource) (*models.ResourceMetadata, error) {
-	if resource.Type != "vm" {
-		return nil, errors.New("unsupported resource type for AWS")
+	// Define tags (including the instance name)
+	tags := []*ec2.Tag{
+		{
+			Key:   aws.String("Name"),
+			Value: aws.String(resource.Name), // Set the instance name
+		},
 	}
 
+	// Create a tag specification for the EC2 instance
+	tagSpecification := &ec2.TagSpecification{
+		ResourceType: aws.String(ec2.ResourceTypeInstance), // Specify that these tags apply to an instance
+		Tags:         tags,
+	}
+
+	// Define input for EC2 instance
 	input := &ec2.RunInstancesInput{
-		ImageId:      aws.String(resource.Image),
-		InstanceType: aws.String(resource.MachineType),
-		MinCount:     aws.Int64(1),
-		MaxCount:     aws.Int64(1),
+		ImageId:           aws.String(resource.Image),       // AMI ID
+		InstanceType:      aws.String(resource.MachineType), // Instance Type
+		SubnetId:          aws.String(resource.Subnet),      // Subnet ID
+		SecurityGroupIds:  aws.StringSlice(resource.SecurityGroups),
+		KeyName:           aws.String(resource.KeyName), // Key Pair Name
+		MinCount:          aws.Int64(1),                 // Number of instances to launch
+		MaxCount:          aws.Int64(1),
+		TagSpecifications: []*ec2.TagSpecification{tagSpecification}, // Attach tags
 	}
 
+	// Make the API call to AWS
 	result, err := p.ec2Client.RunInstances(input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create instance: %v", err)
+		return nil, fmt.Errorf("failed to create EC2 instance: %v", err)
 	}
 
+	// Extract instance metadata
 	instance := result.Instances[0]
-	return &models.ResourceMetadata{
-		ID:        *instance.InstanceId,
+	metadata := &models.ResourceMetadata{
+		ID:        aws.StringValue(instance.InstanceId),
 		Name:      resource.Name,
-		Type:      resource.Type,
+		Type:      "vm",
 		Provider:  "aws",
 		Region:    resource.Region,
-		Status:    *instance.State.Name,
-		CreatedAt: *instance.LaunchTime,
-	}, nil
+		Status:    aws.StringValue(instance.State.Name),
+		CreatedAt: time.Now(),
+	}
+
+	// Return metadata
+	return metadata, nil
 }
 
 // DeleteResource deletes a resource on AWS

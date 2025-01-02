@@ -2,19 +2,32 @@ module cloudcrafter
 
 go 1.23.4
 
-require github.com/stretchr/testify v1.10.0
-
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
+	github.com/AlecAivazis/survey/v2 v2.3.7
+	github.com/stretchr/testify v1.10.0
+	go.uber.org/zap v1.27.0
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.55.5
+	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
+	github.com/fatih/color v1.18.0 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
+	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
+	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
+	github.com/olekukonko/tablewriter v0.0.5 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/schollz/progressbar/v3 v3.17.1 // indirect
+	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
+)
+
+require (
+	 github.com/aws/aws-sdk-go v1.55.5
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

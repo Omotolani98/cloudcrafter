@@ -1,26 +1,50 @@
 package models
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
-// Validate validates the Configuration model
-func (config *Configuration) Validate() error {
-	if config.Provider == "" {
-		return errors.New("provider is required")
+// ValidateResourceConfig validates the resource configuration
+func ValidateResourceConfig(resource Resource) error {
+	// Validate Name
+	if strings.TrimSpace(resource.Name) == "" {
+		return errors.New("resource name cannot be empty")
 	}
 
-	if len(config.Resources) == 0 {
-		return errors.New("at least one resource must be defined")
+	// Validate Machine Type
+	if strings.TrimSpace(resource.MachineType) == "" {
+		return errors.New("machine type cannot be empty")
 	}
 
-	for _, resource := range config.Resources {
-		if resource.Type == "" || resource.Name == "" || resource.Region == "" {
-			return errors.New("resource type, name, and region are required")
-		}
+	// Validate Region
+	if strings.TrimSpace(resource.Region) == "" {
+		return errors.New("region cannot be empty")
+	}
 
-		// Additional validation for VMs
-		if resource.Type == "vm" && resource.MachineType == "" {
-			return errors.New("machineType is required for VM resources")
+	// Validate Image
+	if strings.TrimSpace(resource.Image) == "" || !strings.HasPrefix(resource.Image, "ami-") {
+		return errors.New("image ID must be specified and start with 'ami-'")
+	}
+
+	// Validate Subnet
+	if strings.TrimSpace(resource.Subnet) == "" || !strings.HasPrefix(resource.Subnet, "subnet-") {
+		return errors.New("subnet ID must be specified and start with 'subnet-'")
+	}
+
+	// Validate Security Groups
+	if len(resource.SecurityGroups) == 0 {
+		return errors.New("at least one security group must be specified")
+	}
+	for _, sg := range resource.SecurityGroups {
+		if !strings.HasPrefix(sg, "sg-") {
+			return errors.New("each security group ID must start with 'sg-'")
 		}
+	}
+
+	// Validate Key Name
+	if strings.TrimSpace(resource.KeyName) == "" {
+		return errors.New("key pair name cannot be empty")
 	}
 
 	return nil

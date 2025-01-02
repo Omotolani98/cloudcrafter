@@ -2,23 +2,33 @@ package utils
 
 import (
 	"cloudcrafter/pkg/models"
-	"fmt"
-	"os"
-
 	"gopkg.in/yaml.v2"
+	"os"
 )
 
-// ParseYAMLConfig reads a YAML file and parses it into a Configuration struct
-func ParseYAMLConfig(filePath string) (*models.Configuration, error) {
-	data, err := os.ReadFile(filePath) // Updated to use os.ReadFile
+// ParseYAML parses a YAML file into ResourceConfig
+func ParseYAML(filePath string) (*models.Configuration, error) {
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read YAML file: %w", err)
+		return nil, err
 	}
 
 	var config models.Configuration
-	if err := yaml.Unmarshal(data, &config); err != nil {
-		return nil, fmt.Errorf("failed to parse YAML: %w", err)
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		return nil, err
 	}
 
 	return &config, nil
+}
+
+// GenerateYAML generates a YAML representation of a ResourceConfig
+func GenerateYAML(resource models.Resource) ([]byte, error) {
+	config := models.Configuration{
+		Provider: "aws",
+		Resources: []models.Resource{
+			resource,
+		},
+	}
+	return yaml.Marshal(config)
 }
