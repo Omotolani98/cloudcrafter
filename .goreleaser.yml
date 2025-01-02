@@ -35,6 +35,8 @@ brews:
     description: "CLI for multi-cloud provisioning and resource management"
     homepage: "https://github.com/Omotolani98/cloudcrafter"
     license: "MIT"
+    directory: Formula
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     repository:
       owner: Omotolani98
       name: homebrew-cloudcrafter
