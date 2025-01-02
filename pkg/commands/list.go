@@ -1,19 +1,20 @@
 package commands
 
 import (
-	"cloudcrafter/pkg/logger"
 	"cloudcrafter/pkg/providers"
 	"cloudcrafter/pkg/services"
+	"cloudcrafter/pkg/utils"
 	"fmt"
-
+	"github.com/schollz/progressbar/v3"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
+	"time"
 )
 
+// ListCommand returns the CLI command for listing resources
 func ListCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list",
-		Usage: "List all provisioned resources for a specific provider",
+		Usage: "List provisioned resources for a provider",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "provider",
@@ -25,30 +26,60 @@ func ListCommand() *cli.Command {
 		Action: func(c *cli.Context) error {
 			provider := c.String("provider")
 
-			// Initialize ProviderRegistry based on the provider context
 			providerRegistry, err := providers.InitializeRegistry(provider)
 			if err != nil {
-				return fmt.Errorf("error initializing provider registry: %w", err)
+				fmt.Printf("Error initializing provider: %s\n", err.Error())
 			}
 
-			// Initialize Provisioning Service
-			provisioningService := services.NewProvisioningService(providerRegistry)
+			// Create a progress bar
+			bar := progressbar.NewOptions(100,
+				progressbar.OptionSetDescription("Fetching resources..."),
+				progressbar.OptionSetTheme(progressbar.Theme{
+					Saucer:        "=",
+					SaucerPadding: " ",
+					BarStart:      "[",
+					BarEnd:        "]",
+				}),
+			)
 
-			// List resources
+			// Simulate progress for the bar
+			go func() {
+				for i := 0; i <= 100; i += 10 {
+					err := bar.Add(10)
+					if err != nil {
+						return
+					}
+					time.Sleep(100 * time.Millisecond) // Simulate work
+				}
+			}()
+
+			provisioningService := services.NewProvisioningService(providerRegistry)
+			// Fetch the list of resources
 			resources, err := provisioningService.ListResources(provider)
 			if err != nil {
-				return fmt.Errorf("error listing resources: %w", err)
+				return fmt.Errorf("failed to list resources: %w", err)
 			}
 
-			fmt.Printf("Resources for provider %s:\n", provider)
-			for _, resource := range resources {
-				logger.Log.Info("Resource discovered",
-					zap.String("id", resource.ID),
-					zap.String("name", resource.Name),
-					zap.String("status", resource.Status),
-					zap.String("region", resource.Region),
-				)
+			// Render the resources in a table
+			if len(resources) == 0 {
+				fmt.Println("No resources found.")
+				return nil
 			}
+
+			headers := []string{"ID", "Name", "Type", "Region", "Status", "Created At"}
+			rows := [][]string{}
+			for _, resource := range resources {
+				rows = append(rows, []string{
+					resource.ID,
+					resource.Name,
+					resource.Type,
+					resource.Region,
+					resource.Status,
+					resource.CreatedAt.Format("2006-01-02 15:04:05"),
+				})
+			}
+
+			utils.RenderTable(headers, rows)
 			return nil
 		},
 	}
