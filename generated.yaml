@@ -1,0 +1,9 @@
+provider: aws
+resources:
+- name: "omotolani"
+  machineType: t2.micro
+  region: us-east-1
+  image: ami-039a6f82dd07a541e
+  subnet: subnet-0caca518c360bcc24
+  securityGroups: [sg-09b69ccb471b34fa1,sg-02ae1a90fe30cc4b5]
+  keyName: MacBook Air
