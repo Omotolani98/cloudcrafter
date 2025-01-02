@@ -35,13 +35,13 @@ func (r *ProviderRegistry) Get(providerName string) (providers.Provider, error) 
 		)
 		return nil, fmt.Errorf("provider %s not registered", providerName)
 	}
-	logger.Log.Info("Provider retrieved", zap.String("provider", providerName))
+	fmt.Printf("Provider retrieved: %s\n", providerName)
 	return provider, nil
 }
 
 // InitializeRegistry initializes the ProviderRegistry based on the specified provider context
 func InitializeRegistry(provider string) (*ProviderRegistry, error) {
-	logger.Log.Info("Initializing provider registry", zap.String("provider", provider))
+	fmt.Printf("Initializing provider registry: %s\n", provider)
 
 	registry := NewProviderRegistry()
 
@@ -49,11 +49,11 @@ func InitializeRegistry(provider string) (*ProviderRegistry, error) {
 	case "aws":
 		awsProvider, err := NewAWSProvider("us-east-1") // Region can be made dynamic
 		if err != nil {
-			logger.Log.Error("Failed to initialize AWS provider", zap.Error(err))
+			//logger.Log.Error("Failed to initialize AWS provider", zap.Error(err))
 			return nil, fmt.Errorf("failed to initialize AWS provider: %w", err)
 		}
 		registry.Register("aws", awsProvider)
-		logger.Log.Info("AWS provider registered", zap.String("region", "us-east-1"))
+		fmt.Printf("AWS provider registered: %s\n", "us-east-1")
 	case "azure":
 		// Add Azure provider initialization logic here
 		// azureProvider, err := NewAzureProvider()

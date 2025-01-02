@@ -3,10 +3,10 @@ package main
 import (
 	"cloudcrafter/pkg/commands"
 	"cloudcrafter/pkg/logger"
+	"fmt"
 	"os"
 
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -14,7 +14,7 @@ func main() {
 	logger.InitLogger("development", zapcore.DebugLevel)
 	defer logger.SyncLogger()
 
-	logger.Log.Info("CloudCrafter CLI starting...")
+	fmt.Println("CloudCrafter CLI starting...")
 
 	app := &cli.App{
 		Name:  "CloudCrafter",
@@ -29,6 +29,6 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		logger.Log.Fatal("Application terminated", zap.Error(err))
+		fmt.Println("Application terminated")
 	}
 }

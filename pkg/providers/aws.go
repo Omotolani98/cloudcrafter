@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"go.uber.org/zap"
 )
 
 type AWSProvider struct {
@@ -29,36 +28,6 @@ func NewAWSProvider(region string) (*AWSProvider, error) {
 		ec2Client: ec2.New(sess),
 	}, nil
 }
-
-// CreateResource creates a resource on AWS
-//func (p *AWSProvider) CreateResource(resource models.Resource) (*models.ResourceMetadata, error) {
-//	if resource.Type != "vm" {
-//		return nil, errors.New("unsupported resource type for AWS")
-//	}
-//
-//	input := &ec2.RunInstancesInput{
-//		ImageId:      aws.String(resource.Image),
-//		InstanceType: aws.String(resource.MachineType),
-//		MinCount:     aws.Int64(1),
-//		MaxCount:     aws.Int64(1),
-//	}
-//
-//	result, err := p.ec2Client.RunInstances(input)
-//	if err != nil {
-//		return nil, fmt.Errorf("failed to create instance: %v", err)
-//	}
-//
-//	instance := result.Instances[0]
-//	return &models.ResourceMetadata{
-//		ID:        *instance.InstanceId,
-//		Name:      resource.Name,
-//		Type:      resource.Type,
-//		Provider:  "aws",
-//		Region:    resource.Region,
-//		Status:    *instance.State.Name,
-//		CreatedAt: *instance.LaunchTime,
-//	}, nil
-//}
 
 func (p *AWSProvider) CreateResource(resource models.Resource) (*models.ResourceMetadata, error) {
 	// Define tags (including the instance name)
@@ -147,12 +116,9 @@ func (p *AWSProvider) GetResource(resourceID string) (*models.ResourceMetadata, 
 }
 
 func (p *AWSProvider) ListResources() ([]models.ResourceMetadata, error) {
-	logger.Log.Info("Listing resources for AWS provider")
-
 	input := &ec2.DescribeInstancesInput{}
 	result, err := p.ec2Client.DescribeInstances(input)
 	if err != nil {
-		logger.Log.Error("Failed to list instances", zap.Error(err))
 		return nil, fmt.Errorf("failed to list instances: %v", err)
 	}
 
@@ -177,11 +143,7 @@ func (p *AWSProvider) ListResources() ([]models.ResourceMetadata, error) {
 				CreatedAt: *instance.LaunchTime,
 				UpdatedAt: time.Now(),
 			}
-			logger.Log.Info("Resource discovered",
-				zap.String("id", resource.ID),
-				zap.String("name", resource.Name),
-				zap.String("status", resource.Status),
-			)
+
 			resources = append(resources, resource)
 		}
 	}
@@ -191,6 +153,6 @@ func (p *AWSProvider) ListResources() ([]models.ResourceMetadata, error) {
 		return nil, fmt.Errorf("no resources found in the region")
 	}
 
-	logger.Log.Info("Resources listed successfully", zap.Int("count", len(resources)))
+	fmt.Printf("\nResources listed successfully: %d\n", len(resources))
 	return resources, nil
 }
