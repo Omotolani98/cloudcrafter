@@ -34,17 +34,15 @@ func (p *AWSProvider) CreateResource(resource models.Resource) (*models.Resource
 	tags := []*ec2.Tag{
 		{
 			Key:   aws.String("Name"),
-			Value: aws.String(resource.Name), // Set the instance name
+			Value: aws.String(resource.Name),
 		},
 	}
 
-	// Create a tag specification for the EC2 instance
 	tagSpecification := &ec2.TagSpecification{
 		ResourceType: aws.String(ec2.ResourceTypeInstance), // Specify that these tags apply to an instance
 		Tags:         tags,
 	}
 
-	// Define input for EC2 instance
 	input := &ec2.RunInstancesInput{
 		ImageId:           aws.String(resource.Image),       // AMI ID
 		InstanceType:      aws.String(resource.MachineType), // Instance Type
@@ -56,7 +54,6 @@ func (p *AWSProvider) CreateResource(resource models.Resource) (*models.Resource
 		TagSpecifications: []*ec2.TagSpecification{tagSpecification}, // Attach tags
 	}
 
-	// Make the API call to AWS
 	result, err := p.ec2Client.RunInstances(input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create EC2 instance: %v", err)
