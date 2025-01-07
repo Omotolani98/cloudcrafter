@@ -7,11 +7,10 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap/zapcore"
 )
 
 func main() {
-	logger.InitLogger("development", zapcore.DebugLevel)
+	//logger.InitLogger("development", zapcore.DebugLevel)
 	defer logger.SyncLogger()
 
 	fmt.Println("CloudCrafter CLI starting...")
@@ -30,5 +29,6 @@ func main() {
 	err := app.Run(os.Args)
 	if err != nil {
 		fmt.Println("Application terminated")
+		_ = fmt.Errorf("%v", err)
 	}
 }

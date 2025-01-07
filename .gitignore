@@ -29,3 +29,5 @@ dist/
 cloudcrafter
 
 .idea
+
+generated.yaml

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"cloudcrafter/pkg/models"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"os"
 )
@@ -15,6 +16,7 @@ func ParseYAML(filePath string) (*models.Configuration, error) {
 
 	var config models.Configuration
 	err = yaml.Unmarshal(data, &config)
+	fmt.Printf("%+v\n", config)
 	if err != nil {
 		return nil, err
 	}
@@ -22,13 +24,23 @@ func ParseYAML(filePath string) (*models.Configuration, error) {
 	return &config, nil
 }
 
-// GenerateYAML generates a YAML representation of a ResourceConfig
-func GenerateYAML(resource models.Resource) ([]byte, error) {
-	config := models.Configuration{
-		Provider: "aws",
-		Resources: []models.Resource{
-			resource,
-		},
+func WriteYaml(config models.Configuration, path string) error {
+	if path == "" {
+		path = "config.yml"
 	}
-	return yaml.Marshal(config)
+	file, err := os.Create(path)
+	if err != nil {
+		fmt.Println("Error creating YAML file:", err)
+		return err
+	}
+	defer file.Close()
+
+	encoder := yaml.NewEncoder(file)
+	if err := encoder.Encode(&config); err != nil {
+		fmt.Println("Error writing YAML:", err)
+		return err
+	}
+
+	fmt.Printf("YAML file generated successfully: %s\n", path)
+	return nil
 }
