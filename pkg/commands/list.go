@@ -22,9 +22,15 @@ func ListCommand() *cli.Command {
 				Usage:    "Cloud provider (e.g., aws, azure, gcp)",
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:    "resource",
+				Aliases: []string{"r"},
+				Usage:   "Resource type (e.g., storage, vm)",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			provider := c.String("provider")
+			resourceType := c.String("resource")
 
 			providerRegistry, err := providers.InitializeRegistry(provider)
 			if err != nil {
@@ -55,7 +61,7 @@ func ListCommand() *cli.Command {
 
 			provisioningService := services.NewProvisioningService(providerRegistry)
 			// Fetch the list of resources
-			resources, err := provisioningService.ListResources(provider)
+			resources, err := provisioningService.ListResources(provider, resourceType)
 			if err != nil {
 				return fmt.Errorf("failed to list resources: %w", err)
 			}

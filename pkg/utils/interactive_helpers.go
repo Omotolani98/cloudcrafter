@@ -2,47 +2,99 @@ package utils
 
 import (
 	"cloudcrafter/pkg/models"
+	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 )
 
-// CollectInteractiveResourceData gathers resource data interactively
-func CollectInteractiveResourceData() (models.Resource, error) {
-	var resource models.Resource
+func CollectInteractiveResourceData() (models.Configuration, error) {
+	var config models.Configuration
 
-	// Name
-	_ = survey.AskOne(&survey.Input{
-		Message: "Enter Resource Name (e.g., My Server):",
-	}, &resource.KeyName)
+	providerPrompt := &survey.Select{
+		Message: "Choose a cloud provider:",
+		Options: []string{"aws", "azure", "gcp"},
+	}
+	if err := survey.AskOne(providerPrompt, &config.Provider); err != nil {
+		return config, err
+	}
 
-	// Ask the user for the instance type (machine type)
-	_ = survey.AskOne(&survey.Input{
-		Message: "Enter Instance Type (e.g., t2.micro):",
-	}, &resource.MachineType)
+	var resources []map[string]models.Resource
+	for {
+		var resourceType string
+		resourcePrompt := &survey.Select{
+			Message: "Select a resource type to add:",
+			Options: []string{"vm", "storage", "done"},
+		}
+		if err := survey.AskOne(resourcePrompt, &resourceType); err != nil {
+			return config, err
+		}
 
-	// Region
-	_ = survey.AskOne(&survey.Input{
-		Message: "Enter region (e.g., us-east-1):",
-	}, &resource.Region)
+		if resourceType == "done" {
+			break
+		}
 
-	// Image
-	_ = survey.AskOne(&survey.Input{
-		Message: "Enter AMI ID:",
-	}, &resource.Image)
+		properties := make(map[string]string)
+		switch resourceType {
+		case "vm":
+			properties = promptVMProperties()
+		case "storage":
+			properties = promptStorageProperties()
+		default:
+			fmt.Println("Unknown resource type")
+			continue
+		}
 
-	// Subnet
-	_ = survey.AskOne(&survey.Input{
-		Message: "Enter Subnet ID:",
-	}, &resource.Subnet)
+		resource := map[string]models.Resource{
+			resourceType: {
+				Type:       resourceType,
+				Properties: properties,
+			},
+		}
+		resources = append(resources, resource)
+	}
 
-	// Security Groups
-	_ = survey.AskOne(&survey.Input{
-		Message: "Enter Security Group IDs (comma-separated):",
-	}, &resource.SecurityGroups)
+	config.Resources = resources
+	return config, nil
+}
 
-	// Key Pair
-	_ = survey.AskOne(&survey.Input{
-		Message: "Enter Key Pair name:",
-	}, &resource.KeyName)
+func promptVMProperties() map[string]string {
+	properties := make(map[string]string)
 
-	return resource, nil
+	var vmName, machineType, region, image, subnet, securityGroups, keyName string
+
+	survey.AskOne(&survey.Input{Message: "Enter VM name:"}, &vmName)
+	properties["name"] = vmName
+
+	survey.AskOne(&survey.Input{Message: "Enter machine type (e.g., t2.micro):"}, &machineType)
+	properties["machineType"] = machineType
+
+	survey.AskOne(&survey.Input{Message: "Enter region (e.g., us-east-1):"}, &region)
+	properties["region"] = region
+
+	survey.AskOne(&survey.Input{Message: "Enter image ID (e.g., ami-123456):"}, &image)
+	properties["image"] = image
+
+	survey.AskOne(&survey.Input{Message: "Enter subnet ID:"}, &subnet)
+	properties["subnet"] = subnet
+
+	survey.AskOne(&survey.Input{Message: "Enter security groups (comma-separated):"}, &securityGroups)
+	properties["securityGroups"] = securityGroups
+
+	survey.AskOne(&survey.Input{Message: "Enter key name:"}, &keyName)
+	properties["keyName"] = keyName
+
+	return properties
+}
+
+func promptStorageProperties() map[string]string {
+	properties := make(map[string]string)
+
+	var bucketName string
+	err := survey.AskOne(&survey.Input{Message: "Enter bucket name:"}, &bucketName)
+	if err != nil {
+		_ = fmt.Errorf("%v\n", err)
+		return nil
+	}
+	properties["bucketName"] = bucketName
+
+	return properties
 }

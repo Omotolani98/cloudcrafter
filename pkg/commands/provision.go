@@ -15,27 +15,25 @@ func ProvisionCommand() *cli.Command {
 		Usage: "Provision resources (YAML-based or interactive)",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "file",
-				Usage: "Path to the YAML configuration file",
+				Name:    "file",
+				Aliases: []string{"f"},
+				Usage:   "Path to the YAML configuration file",
 			},
 			&cli.StringFlag{
-				Name:  "provider",
-				Usage: "Provider to use",
+				Name:    "provider",
+				Aliases: []string{"p"},
+				Usage:   "Provider to use",
 			},
 		},
 		Action: func(c *cli.Context) error {
 			file := c.String("file")
 			provider := c.String("provider")
 
-			if file != "" {
-				return provisionFromYAML(file, provider)
-			}
-			return provisionInteractive()
+			return provisionFromYAML(file, provider)
 		},
 	}
 }
 
-// YAML-based provisioning
 func provisionFromYAML(filePath string, providerName string) error {
 	config, err := utils.ParseYAML(filePath)
 	if err != nil {
@@ -52,39 +50,7 @@ func provisionFromYAML(filePath string, providerName string) error {
 	if err != nil {
 		return fmt.Errorf("failed to provision resource: %v", err)
 	}
-	//provider, err := providers.NewAWSProvider(config.Provider)
-	//if err != nil {
-	//	return fmt.Errorf("failed to initialize AWS provider: %v", err)
-	//}
-	//
-	//for _, resource := range config.Resources {
-	//	metadata, err := provider.CreateResource(resource)
-	//	if err != nil {
-	//		return fmt.Errorf("failed to provision resource %s: %v", resource.Name, err)
-	//	}
-	//	fmt.Printf("Provisioned resource: %+v\n", metadata)
-	//}
 
-	fmt.Printf("Provisioned resource: %+v\n", metadata)
-
-	return nil
-}
-
-// Interactive provisioning
-func provisionInteractive() error {
-	resource, err := utils.CollectInteractiveResourceData()
-	if err != nil {
-		return err
-	}
-
-	provider, err := providers.NewAWSProvider(resource.Region)
-	if err != nil {
-		fmt.Printf("Failed to initialize AWS provider: %v\n", err)
-	}
-	metadata, err := provider.CreateResource(resource)
-	if err != nil {
-		return fmt.Errorf("failed to provision resource interactively: %v", err)
-	}
 	fmt.Printf("Provisioned resource: %+v\n", metadata)
 
 	return nil
