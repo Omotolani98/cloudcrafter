@@ -16,7 +16,7 @@ func ParseYAML(filePath string) (*models.Configuration, error) {
 
 	var config models.Configuration
 	err = yaml.Unmarshal(data, &config)
-	fmt.Printf("%+v\n", config)
+
 	if err != nil {
 		return nil, err
 	}

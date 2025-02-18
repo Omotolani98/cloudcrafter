@@ -272,3 +272,48 @@ func (p *AWSProvider) DownloadObject(bucketName, key, filePath string) error {
 	}
 	return nil
 }
+
+func (p *AWSProvider) EstimateVMCost(properties *map[string]string) (float64, error) {
+	if properties == nil {
+		return 0, fmt.Errorf("properties map is nil")
+	}
+
+	instanceType, ok := (*properties)["machineType"]
+	if !ok || instanceType == "" {
+		return 0, fmt.Errorf("missing required property: machineType")
+	}
+
+	region, ok := (*properties)["region"]
+	if !ok || region == "" {
+		return 0, fmt.Errorf("missing required property: region")
+	}
+
+	fmt.Printf("Instance Type: %s, Region: %s\n", instanceType, region)
+
+	// Example: Placeholder pricing logic. Replace with AWS Pricing API or a static map.
+	pricing := map[string]float64{
+		"t2.micro": 0.0116, // $ per hour
+		"t2.small": 0.023,
+	}
+
+	costPerHour, exists := pricing[instanceType]
+	if !exists {
+		return 0, fmt.Errorf("unsupported instance type: %s", instanceType)
+	}
+
+	// Assume 730 hours per month for cost estimation
+	monthlyCost := costPerHour * 730
+	return monthlyCost, nil
+}
+
+//func (p *AWSProvider) EstimateVMCost(properties *map[string]string) (float64, error) {
+//	return 10.0, nil
+//}
+
+func (p *AWSProvider) EstimateStorageCost(properties *map[string]string) (float64, error) {
+	return 0.023, nil
+}
+
+func (p *AWSProvider) EstimateDatabasesCost(properties *map[string]string) (float64, error) {
+	return 5.00, nil
+}

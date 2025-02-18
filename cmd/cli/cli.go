@@ -23,6 +23,7 @@ func main() {
 			commands.GenerateYAMLCommand(),
 			commands.ListCommand(),
 			commands.DeleteCommand(),
+			commands.PlanCommand(),
 		},
 	}
 
