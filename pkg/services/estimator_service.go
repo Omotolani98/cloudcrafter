@@ -1,9 +1,10 @@
 package services
 
 import (
-	"cloudcrafter/pkg/models"
-	"cloudcrafter/pkg/providers"
 	"fmt"
+
+	"github.com/Omotolani98/cloudcrafter/pkg/models"
+	"github.com/Omotolani98/cloudcrafter/pkg/providers"
 )
 
 type EstimatorService struct {

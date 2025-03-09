@@ -1,18 +1,17 @@
 package providers
 
 import (
-	"cloudcrafter/pkg/logger"
-	"cloudcrafter/pkg/models"
 	"fmt"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"io"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/Omotolani98/cloudcrafter/pkg/logger"
+	"github.com/Omotolani98/cloudcrafter/pkg/models"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 type AWSProvider struct {
@@ -35,7 +34,7 @@ func NewAWSProvider(region string) (*AWSProvider, error) {
 	}, nil
 }
 
-func (p *AWSProvider) CreateResource(resource models.Resource) (*models.ResourceMetadata, error) {
+func (p *AWSProvider) CreateResource(resource models.Resource, config models.Configuration) (*models.ResourceMetadata, error) {
 	image, ok := resource.Properties["image"]
 	if !ok {
 		return nil, fmt.Errorf("missing required property: image")
@@ -46,23 +45,74 @@ func (p *AWSProvider) CreateResource(resource models.Resource) (*models.Resource
 		return nil, fmt.Errorf("missing required property: machineType")
 	}
 
-	subnet, ok := resource.Properties["subnet"]
-	if !ok {
-		return nil, fmt.Errorf("missing required property: subnet")
-	}
-
 	keyName, ok := resource.Properties["keyName"]
 	if !ok {
 		return nil, fmt.Errorf("missing required property: keyName")
 	}
 
-	securityGroups, ok := resource.Properties["securityGroups"]
-	if !ok {
-		return nil, fmt.Errorf("missing required property: securityGroups")
+	// Extract networking details from the configuration
+	vpcCidr := config.Networking.VPC.CIDRBlock
+	subnetCidr := config.Networking.Subnet.CIDRBlock
+	securityGroupDescription := config.Networking.SecurityGroup.Description
+	ingressRules := config.Networking.SecurityGroup.IngressRules
+
+	// Create VPC
+	vpcOutput, err := p.ec2Client.CreateVpc(&ec2.CreateVpcInput{
+		CidrBlock: aws.String(vpcCidr),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create VPC: %v", err)
+	}
+	vpcID := vpcOutput.Vpc.VpcId
+
+	// Create Subnet
+	subnetOutput, err := p.ec2Client.CreateSubnet(&ec2.CreateSubnetInput{
+		CidrBlock: aws.String(subnetCidr),
+		VpcId:     vpcID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create subnet: %v", err)
+	}
+	subnetID := subnetOutput.Subnet.SubnetId
+
+	// Create Security Group
+	sgOutput, err := p.ec2Client.CreateSecurityGroup(&ec2.CreateSecurityGroupInput{
+		Description: aws.String(securityGroupDescription),
+		GroupName:   aws.String(resource.Properties["name"] + "-sg"),
+		VpcId:       vpcID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create security group: %v", err)
+	}
+	securityGroupID := sgOutput.GroupId
+
+	// Add Ingress Rules to Security Group
+	for _, rule := range ingressRules {
+		_, err := p.ec2Client.AuthorizeSecurityGroupIngress(&ec2.AuthorizeSecurityGroupIngressInput{
+			GroupId: securityGroupID,
+			IpPermissions: []*ec2.IpPermission{
+				{
+					IpProtocol: aws.String(rule.Protocol),
+					FromPort:   aws.Int64(int64(rule.FromPort)),
+					ToPort:     aws.Int64(int64(rule.ToPort)),
+					IpRanges: []*ec2.IpRange{
+						{
+							CidrIp: aws.String(rule.CIDRIP),
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to authorize security group ingress: %v", err)
+		}
 	}
 
-	securityGroupIDs := aws.StringSlice(strings.Split(securityGroups, ","))
+	fmt.Printf("VPC ID: %s\n", aws.StringValue(vpcID))
+	fmt.Printf("Subnet ID: %s\n", aws.StringValue(subnetID))
+	fmt.Printf("Security Group ID: %s\n", aws.StringValue(securityGroupID))
 
+	// Create EC2 Instance
 	tags := []*ec2.Tag{
 		{
 			Key:   aws.String("Name"),
@@ -78,8 +128,8 @@ func (p *AWSProvider) CreateResource(resource models.Resource) (*models.Resource
 	input := &ec2.RunInstancesInput{
 		ImageId:           aws.String(image),
 		InstanceType:      aws.String(machineType),
-		SubnetId:          aws.String(subnet),
-		SecurityGroupIds:  securityGroupIDs,
+		SubnetId:          subnetID,
+		SecurityGroupIds:  []*string{securityGroupID},
 		KeyName:           aws.String(keyName),
 		MinCount:          aws.Int64(1),
 		MaxCount:          aws.Int64(1),

@@ -1,10 +1,11 @@
 package services
 
 import (
-	"cloudcrafter/pkg/models"
-	"cloudcrafter/pkg/providers"
 	"fmt"
 	"time"
+
+	"github.com/Omotolani98/cloudcrafter/pkg/models"
+	"github.com/Omotolani98/cloudcrafter/pkg/providers"
 )
 
 type ProvisioningService struct {
@@ -33,7 +34,7 @@ func (s *ProvisioningService) CreateResource(config *models.Configuration) ([]*m
 		for resourceType, resource := range resourceMap {
 			switch resourceType {
 			case "vm":
-				resourceMetadata, err := provider.CreateResource(resource)
+				resourceMetadata, err := provider.CreateResource(resource, *config)
 				if err != nil {
 					return nil, fmt.Errorf("failed to provision VM resource: %w", err)
 				}

@@ -1,12 +1,12 @@
 package main
 
 import (
-	"cloudcrafter/internal/db"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/Omotolani98/cloudcrafter/internal/db"
 	"github.com/gin-gonic/gin"
 )
 

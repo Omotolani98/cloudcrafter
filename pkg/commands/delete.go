@@ -1,9 +1,10 @@
 package commands
 
 import (
-	"cloudcrafter/pkg/providers"
-	"cloudcrafter/pkg/services"
 	"fmt"
+
+	"github.com/Omotolani98/cloudcrafter/pkg/providers"
+	"github.com/Omotolani98/cloudcrafter/pkg/services"
 
 	"github.com/urfave/cli/v2"
 )

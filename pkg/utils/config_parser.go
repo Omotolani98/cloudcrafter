@@ -1,10 +1,12 @@
 package utils
 
 import (
-	"cloudcrafter/pkg/models"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"os"
+
+	"gopkg.in/yaml.v2"
+
+	"github.com/Omotolani98/cloudcrafter/pkg/models"
 )
 
 // ParseYAML parses a YAML file into ResourceConfig

@@ -1,9 +1,10 @@
 package providers
 
 import (
-	providers "cloudcrafter/pkg/interfaces"
-	"cloudcrafter/pkg/logger"
 	"fmt"
+
+	providers "github.com/Omotolani98/cloudcrafter/pkg/interfaces"
+	"github.com/Omotolani98/cloudcrafter/pkg/logger"
 
 	"go.uber.org/zap"
 )

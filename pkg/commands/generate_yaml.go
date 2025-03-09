@@ -1,8 +1,9 @@
 package commands
 
 import (
-	"cloudcrafter/pkg/utils"
 	"fmt"
+
+	"github.com/Omotolani98/cloudcrafter/pkg/utils"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,7 +20,12 @@ func GenerateYAMLCommand() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			resource, err := utils.CollectInteractiveResourceData()
+			networkingChoice, err := utils.PromptNetworkingChoice()
+			if err != nil {
+				return fmt.Errorf("failed to collect networking choice: %v", err)
+			}
+
+			resource, err := utils.CollectInteractiveResourceData(networkingChoice)
 			if err != nil {
 				return fmt.Errorf("failed to collect resource data: %v", err)
 			}

@@ -1,13 +1,15 @@
 package commands
 
 import (
-	"cloudcrafter/pkg/providers"
-	"cloudcrafter/pkg/services"
-	"cloudcrafter/pkg/utils"
 	"fmt"
+
+	"time"
+
+	"github.com/Omotolani98/cloudcrafter/pkg/providers"
+	"github.com/Omotolani98/cloudcrafter/pkg/services"
+	"github.com/Omotolani98/cloudcrafter/pkg/utils"
 	"github.com/schollz/progressbar/v3"
 	"github.com/urfave/cli/v2"
-	"time"
 )
 
 // ListCommand returns the CLI command for listing resources

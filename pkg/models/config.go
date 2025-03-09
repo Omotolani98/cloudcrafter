@@ -5,18 +5,42 @@ import (
 	"time"
 )
 
+// NetworkingConfig represents a generic networking configuration for cloud providers.
+type NetworkingConfig struct {
+	VPC struct {
+		CIDRBlock string `json:"cidrBlock"`
+	} `json:"vpc"`
+	Subnet struct {
+		CIDRBlock string `json:"cidrBlock"`
+	} `json:"subnet"`
+	SecurityGroup struct {
+		Description  string        `json:"description"`
+		IngressRules []IngressRule `json:"ingressRules"`
+	} `json:"securityGroup"`
+}
+
+// IngressRule represents a rule for allowing inbound traffic.
+type IngressRule struct {
+	Protocol string `json:"protocol"`
+	FromPort int    `json:"fromPort"`
+	ToPort   int    `json:"toPort"`
+	CIDRIP   string `json:"cidrIp"`
+}
+
+// Configuration represents the overall configuration including networking.
 type Configuration struct {
-	Provider  string                `json:"provider" yaml:"provider"` // Cloud provider (e.g., AWS, Azure, GCP)
-	Resources []map[string]Resource `json:"resources" yaml:"resources"`
+	Provider   string                `json:"provider"`
+	Networking NetworkingConfig      `json:"networking"`
+	Resources  []map[string]Resource `json:"resources"`
+}
+
+// Resource represents a cloud resource.
+type Resource struct {
+	Type       string            `json:"type"`
+	Properties map[string]string `json:"properties"`
 }
 
 // Resource defines a single cloud resource configuration
-type Resource struct {
-	Type            string            `json:"type" yaml:"type"`             // Resource type (e.g., vm, storage, etc.)
-	Properties      map[string]string `json:"properties" yaml:"properties"` // Generic properties for different resource types
-	NestedResources []NestedResource  `json:"nestedResources,omitempty" yaml:"nestedResources,omitempty"`
-}
-
 type NestedResource struct {
 	Type       string            `json:"type" yaml:"type"` // Nested resource type
 	Properties map[string]string `json:"properties" yaml:"properties"`

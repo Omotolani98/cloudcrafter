@@ -1,4 +1,4 @@
-module cloudcrafter
+module github.com/Omotolani98/cloudcrafter
 
 go 1.23.4
 

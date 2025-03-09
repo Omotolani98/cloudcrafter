@@ -1,10 +1,11 @@
 package main
 
 import (
-	"cloudcrafter/pkg/commands"
-	"cloudcrafter/pkg/logger"
 	"fmt"
 	"os"
+
+	"github.com/Omotolani98/cloudcrafter/pkg/commands"
+	"github.com/Omotolani98/cloudcrafter/pkg/logger"
 
 	"github.com/urfave/cli/v2"
 )
