@@ -10,7 +10,7 @@ import (
 )
 
 func TestJSONParsing(t *testing.T) {
-	// Example JSON configuration
+
 	jsonData := `{
 		"provider": "aws",
 		"resources": [
@@ -35,7 +35,7 @@ func TestJSONParsing(t *testing.T) {
 }
 
 func TestYAMLParsing(t *testing.T) {
-	// Example YAML configuration
+
 	yamlData := `
 provider: aws
 resources:

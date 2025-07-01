@@ -20,7 +20,6 @@ type AWSProvider struct {
 	s3Client  *s3.S3
 }
 
-// NewAWSProvider initializes the AWS provider
 func NewAWSProvider(region string) (*AWSProvider, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String(region),
@@ -118,7 +117,6 @@ func (p *AWSProvider) DeleteResource(resourceID string) error {
 	return nil
 }
 
-// GetResource retrieves metadata about a resource
 func (p *AWSProvider) GetResource(resourceID string) (*models.ResourceMetadata, error) {
 	input := &ec2.DescribeInstancesInput{
 		InstanceIds: []*string{aws.String(resourceID)},
@@ -132,7 +130,7 @@ func (p *AWSProvider) GetResource(resourceID string) (*models.ResourceMetadata, 
 	instance := result.Reservations[0].Instances[0]
 	return &models.ResourceMetadata{
 		ID:        *instance.InstanceId,
-		Name:      "", // AWS doesn't allow custom names by default
+		Name:      "", 
 		Type:      "vm",
 		Provider:  "aws",
 		Region:    *instance.Placement.AvailabilityZone,
@@ -194,7 +192,6 @@ func (p *AWSProvider) CreateBucket(bucketName string) error {
 	return nil
 }
 
-// ListBuckets lists all S3 buckets
 func (p *AWSProvider) ListBuckets() ([]models.S3Bucket, error) {
 	fmt.Println("Listing S3 buckets...")
 	output, err := p.s3Client.ListBuckets(&s3.ListBucketsInput{})
@@ -223,7 +220,6 @@ func (p *AWSProvider) DeleteBucket(bucketName string) error {
 	return nil
 }
 
-// UploadObject uploads a file to an S3 bucket
 func (p *AWSProvider) UploadObject(bucketName, key, filePath string) error {
 	fmt.Printf("Uploading object to S3...%s :: %s\n", bucketName, key)
 	file, err := os.Open(filePath)
@@ -290,9 +286,9 @@ func (p *AWSProvider) EstimateVMCost(properties *map[string]string) (float64, er
 
 	fmt.Printf("Instance Type: %s, Region: %s\n", instanceType, region)
 
-	// Example: Placeholder pricing logic. Replace with AWS Pricing API or a static map.
+	
 	pricing := map[string]float64{
-		"t2.micro": 0.0116, // $ per hour
+		"t2.micro": 0.0116, 
 		"t2.small": 0.023,
 	}
 
@@ -301,14 +297,11 @@ func (p *AWSProvider) EstimateVMCost(properties *map[string]string) (float64, er
 		return 0, fmt.Errorf("unsupported instance type: %s", instanceType)
 	}
 
-	// Assume 730 hours per month for cost estimation
+	
 	monthlyCost := costPerHour * 730
 	return monthlyCost, nil
 }
 
-//func (p *AWSProvider) EstimateVMCost(properties *map[string]string) (float64, error) {
-//	return 10.0, nil
-//}
 
 func (p *AWSProvider) EstimateStorageCost(properties *map[string]string) (float64, error) {
 	return 0.023, nil

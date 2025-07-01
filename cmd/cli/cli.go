@@ -3,33 +3,30 @@ package main
 import (
 	"cloudcrafter/pkg/commands"
 	"cloudcrafter/pkg/logger"
-	"fmt"
+	"context"
 	"os"
 
-	"github.com/urfave/cli/v2"
+	"github.com/charmbracelet/fang"
+	"github.com/spf13/cobra"
 )
 
 func main() {
-	//logger.InitLogger("development", zapcore.DebugLevel)
 	defer logger.SyncLogger()
 
-	fmt.Println("CloudCrafter CLI starting...")
-
-	app := &cli.App{
-		Name:  "CloudCrafter",
-		Usage: "Provision and manage cloud resources across multiple providers",
-		Commands: []*cli.Command{
-			commands.ProvisionCommand(),
-			commands.GenerateYAMLCommand(),
-			commands.ListCommand(),
-			commands.DeleteCommand(),
-			commands.PlanCommand(),
-		},
+	rootCmd := &cobra.Command{
+		Use:   "cloudcrafter",
+		Short: "Provision and manage cloud resources across multiple providers",
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
-		fmt.Println("Application terminated")
-		_ = fmt.Errorf("%v", err)
+	rootCmd.AddCommand(
+		commands.ProvisionCommand(),
+		commands.GenerateYAMLCommand(),
+		commands.ListCommand(),
+		commands.DeleteCommand(),
+		commands.PlanCommand(),
+	)
+
+	if err := fang.Execute(context.Background(), rootCmd); err != nil {
+		os.Exit(1)
 	}
 }

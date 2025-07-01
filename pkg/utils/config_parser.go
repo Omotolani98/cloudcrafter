@@ -7,7 +7,6 @@ import (
 	"os"
 )
 
-// ParseYAML parses a YAML file into ResourceConfig
 func ParseYAML(filePath string) (*models.Configuration, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {

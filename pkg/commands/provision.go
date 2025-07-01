@@ -5,33 +5,26 @@ import (
 	"cloudcrafter/pkg/services"
 	"cloudcrafter/pkg/utils"
 	"fmt"
-	"github.com/urfave/cli/v2"
+
+	"github.com/spf13/cobra"
 )
 
-// ProvisionCommand returns the CLI command for provisioning
-func ProvisionCommand() *cli.Command {
-	return &cli.Command{
-		Name:  "provision",
-		Usage: "Provision resources (YAML-based or interactive)",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "file",
-				Aliases: []string{"f"},
-				Usage:   "Path to the YAML configuration file",
-			},
-			&cli.StringFlag{
-				Name:    "provider",
-				Aliases: []string{"p"},
-				Usage:   "Provider to use",
-			},
-		},
-		Action: func(c *cli.Context) error {
-			file := c.String("file")
-			provider := c.String("provider")
+func ProvisionCommand() *cobra.Command {
+	var file string
+	var provider string
 
+	cmd := &cobra.Command{
+		Use:   "provision",
+		Short: "Provision resources (YAML-based or interactive)",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			return provisionFromYAML(file, provider)
 		},
 	}
+
+	cmd.Flags().StringVarP(&file, "file", "f", "", "Path to the YAML configuration file")
+	cmd.Flags().StringVarP(&provider, "provider", "p", "", "Provider to use")
+
+	return cmd
 }
 
 func provisionFromYAML(filePath string, providerName string) error {
