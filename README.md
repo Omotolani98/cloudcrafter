@@ -64,7 +64,7 @@ go mod tidy
 
 ### **3. Run the Application**
 ```bash
-go run cmd/main.go
+go run cmd/server/main.go
 ```
 
 ### **4. Test the API**
