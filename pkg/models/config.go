@@ -6,23 +6,21 @@ import (
 )
 
 type Configuration struct {
-	Provider  string                `json:"provider" yaml:"provider"` // Cloud provider (e.g., AWS, Azure, GCP)
-	Resources []map[string]Resource `json:"resources" yaml:"resources"`
+        Provider  string                `json:"provider" yaml:"provider"`
+        Resources []map[string]Resource `json:"resources" yaml:"resources"`
 }
 
-// Resource defines a single cloud resource configuration
 type Resource struct {
-	Type            string            `json:"type" yaml:"type"`             // Resource type (e.g., vm, storage, etc.)
-	Properties      map[string]string `json:"properties" yaml:"properties"` // Generic properties for different resource types
+	Type            string            `json:"type" yaml:"type"`             
+	Properties      map[string]string `json:"properties" yaml:"properties"` 
 	NestedResources []NestedResource  `json:"nestedResources,omitempty" yaml:"nestedResources,omitempty"`
 }
 
 type NestedResource struct {
-	Type       string            `json:"type" yaml:"type"` // Nested resource type
+	Type       string            `json:"type" yaml:"type"` 
 	Properties map[string]string `json:"properties" yaml:"properties"`
 }
 
-// S3Bucket defines the structure for S3 bucket metadata
 type S3Bucket struct {
 	Name         string     `json:"name"`
 	CreationDate *time.Time `json:"creationDate"`

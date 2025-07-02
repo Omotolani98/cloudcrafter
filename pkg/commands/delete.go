@@ -5,37 +5,18 @@ import (
 	"cloudcrafter/pkg/services"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 )
 
-func DeleteCommand() *cli.Command {
-	return &cli.Command{
-		Name:  "delete",
-		Usage: "Delete a resource by provider and ID",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "provider",
-				Aliases:  []string{"p"},
-				Usage:    "Cloud provider (e.g., aws, azure, gcp)",
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:    "resource",
-				Aliases: []string{"r"},
-				Usage:   "Resource type (e.g., storage, vm)",
-			},
-			&cli.StringFlag{
-				Name:     "id",
-				Aliases:  []string{"i"},
-				Usage:    "Resource ID",
-				Required: true,
-			},
-		},
-		Action: func(c *cli.Context) error {
-			provider := c.String("provider")
-			resourceType := c.String("resource")
-			resourceID := c.String("id")
+func DeleteCommand() *cobra.Command {
+	var provider string
+	var resourceType string
+	var resourceID string
 
+	cmd := &cobra.Command{
+		Use:   "delete",
+		Short: "Delete a resource by provider and ID",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			providerRegistry, err := providers.InitializeRegistry(provider)
 			if err != nil {
 				return fmt.Errorf("error initializing provider registry: %w", err)
@@ -52,4 +33,12 @@ func DeleteCommand() *cli.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().StringVarP(&provider, "provider", "p", "", "Cloud provider (e.g., aws, azure, gcp)")
+	cmd.Flags().StringVarP(&resourceType, "resource", "r", "", "Resource type (e.g., storage, vm)")
+	cmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
+	_ = cmd.MarkFlagRequired("provider")
+	_ = cmd.MarkFlagRequired("id")
+
+	return cmd
 }

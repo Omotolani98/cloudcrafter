@@ -10,19 +10,17 @@ type EstimatorService struct {
 	providerRegistry *providers.ProviderRegistry
 }
 
-// NewEstimatorService initializes a new cost estimation service
 func NewEstimatorService(providerRegistry *providers.ProviderRegistry) *EstimatorService {
 	return &EstimatorService{
 		providerRegistry: providerRegistry,
 	}
 }
 
-// EstimateCosts calculates the estimated costs of all resources in the config
 func (s *EstimatorService) EstimateCosts(config *models.Configuration) (float64, error) {
-	// Print all registered estimators
+	
 	fmt.Printf("Available cost estimators: %+v\n", s.providerRegistry.CostEstimators)
 
-	// Get the cost estimator
+	
 	estimator, err := s.providerRegistry.GetCostEstimator(config.Provider)
 	if estimator == nil {
 		fmt.Println("Error: No cost estimator found for provider", config.Provider)
