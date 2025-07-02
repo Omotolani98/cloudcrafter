@@ -2,7 +2,7 @@ package providers
 
 import "cloudcrafter/pkg/models"
 
-type Provider interface {
+//type Provider interface {
 type Provider interface {
 	CreateResource(resource models.Resource) (*models.ResourceMetadata, error)
 	DeleteResource(resourceID string) error
