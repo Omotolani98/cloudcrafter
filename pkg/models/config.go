@@ -52,6 +52,10 @@ type S3Bucket struct {
 	CreationDate *time.Time `json:"creationDate"`
 }
 
+type Network struct {
+	NetworkId string `json:"networkId"`
+}
+
 func (c *Configuration) Validate() error {
 	if c.Provider == "" {
 		return fmt.Errorf("provider is required")

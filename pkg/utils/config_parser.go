@@ -35,7 +35,13 @@ func WriteYaml(config models.Configuration, path string) error {
 		fmt.Println("Error creating YAML file:", err)
 		return err
 	}
-	defer file.Close()
+
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Println("Error closing file:", err)
+		}
+	}(file)
 
 	encoder := yaml.NewEncoder(file)
 	if err := encoder.Encode(&config); err != nil {
@@ -43,6 +49,5 @@ func WriteYaml(config models.Configuration, path string) error {
 		return err
 	}
 
-	fmt.Printf("YAML file generated successfully: %s\n", path)
 	return nil
 }

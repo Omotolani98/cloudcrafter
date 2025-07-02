@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "name": "Multi-Cloud Provisioner Collection",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
-}

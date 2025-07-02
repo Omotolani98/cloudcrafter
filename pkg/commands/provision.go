@@ -20,28 +20,21 @@ func ProvisionCommand() *cli.Command {
 				Aliases: []string{"f"},
 				Usage:   "Path to the YAML configuration file",
 			},
-			&cli.StringFlag{
-				Name:    "provider",
-				Aliases: []string{"p"},
-				Usage:   "Provider to use",
-			},
 		},
 		Action: func(c *cli.Context) error {
 			file := c.String("file")
-			provider := c.String("provider")
-
-			return provisionFromYAML(file, provider)
+			return provisionFromYAML(file)
 		},
 	}
 }
 
-func provisionFromYAML(filePath string, providerName string) error {
+func provisionFromYAML(filePath string) error {
 	config, err := utils.ParseYAML(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to parse YAML: %v", err)
 	}
 
-	providerRegistry, err := providers.InitializeRegistry(providerName)
+	providerRegistry, err := providers.InitializeRegistry(config.Provider)
 	if err != nil {
 		return fmt.Errorf("failed to initialize provider registry: %v", err)
 	}

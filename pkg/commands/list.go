@@ -46,7 +46,7 @@ func ListCommand() *cli.Command {
 					Saucer:        "=",
 					SaucerPadding: " ",
 					BarStart:      "[",
-					BarEnd:        "]",
+					BarEnd:        "]\n",
 				}),
 			)
 

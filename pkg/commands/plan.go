@@ -33,15 +33,14 @@ func PlanCommand() *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			file := c.String("file")
-			estimateCost := c.Bool("estimate-cost")
 
 			// Call the plan logic
-			return planFromYAML(file, estimateCost)
+			return planFromYAML(file)
 		},
 	}
 }
 
-func planFromYAML(filePath string, estimateCost bool) error {
+func planFromYAML(filePath string) error {
 	// Parse the YAML configuration
 	config, err := utils.ParseYAML(filePath)
 	if err != nil {
@@ -57,24 +56,11 @@ func planFromYAML(filePath string, estimateCost bool) error {
 	// Initialize the provisioning service
 	estimatorService := services.NewEstimatorService(providerRegistry)
 
-	// If cost estimation is requested
-	if estimateCost {
-		totalCost, err := estimatorService.EstimateCosts(config)
-		if err != nil {
-			return fmt.Errorf("failed to estimate costs: %v", err)
-		}
-
-		fmt.Printf("Estimated Cost: $%.2f/month\n", totalCost)
-		return nil
-	}
-
-	// If no cost estimation, just plan the resources
-	metadata, err := estimatorService.EstimateCosts(config)
+	totalCost, err := estimatorService.EstimateCosts(config)
 	if err != nil {
-		return fmt.Errorf("failed to plan resources: %v", err)
+		return fmt.Errorf("failed to estimate costs: %v", err)
 	}
 
-	fmt.Printf("Planned resources: %+v\n", metadata)
-
+	fmt.Printf("Estimated Cost: $%.2f/month\n", totalCost)
 	return nil
 }

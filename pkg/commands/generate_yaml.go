@@ -10,8 +10,9 @@ import (
 // GenerateYAMLCommand returns the CLI command for generating YAML
 func GenerateYAMLCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "generate-yaml",
-		Usage: "Generate a YAML file interactively",
+		Name:        "generate",
+		Usage:       "Generate a YAML file interactively",
+		Description: "Generate a YAML file interactively",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "output",

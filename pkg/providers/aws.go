@@ -233,6 +233,37 @@ func (p *AWSProvider) ListResources() ([]models.ResourceMetadata, error) {
 	return resources, nil
 }
 
+func (p *AWSProvider) ListNetworks() ([]string, error) {
+	input := &ec2.DescribeNetworkInterfacesInput{}
+	result, err := p.ec2Client.DescribeNetworkInterfaces(input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list network interfaces: %v", err)
+	}
+	var networks []string
+	for _, networkInterface := range result.NetworkInterfaces {
+		networks = append(networks, aws.StringValue(networkInterface.NetworkInterfaceId))
+	}
+
+	if len(networks) == 0 {
+		return nil, fmt.Errorf("no resources found in the region")
+	}
+
+	return networks, nil
+}
+
+func (p *AWSProvider) DeleteNetwork(resourceID string) error {
+	input := &ec2.DeleteNetworkInterfaceInput{
+		NetworkInterfaceId: aws.String(resourceID),
+	}
+
+	_, err := p.ec2Client.DeleteNetworkInterface(input)
+	if err != nil {
+		return fmt.Errorf("failed to delete network interface: %v", err)
+	}
+
+	return nil
+}
+
 func (p *AWSProvider) CreateBucket(bucketName string) error {
 	fmt.Printf("Creating S3 bucket...%s\n", bucketName)
 	_, err := p.s3Client.CreateBucket(&s3.CreateBucketInput{

@@ -9,7 +9,10 @@ type Provider interface {
 	CreateResource(resource models.Resource, config models.Configuration) (*models.ResourceMetadata, error)
 	DeleteResource(resourceID string) error
 	GetResource(resourceID string) (*models.ResourceMetadata, error)
-	ListResources() ([]models.ResourceMetadata, error) // Add ListResources here
+	ListResources() ([]models.ResourceMetadata, error)
+
+	ListNetworks() ([]string, error)
+	DeleteNetwork(resourceID string) error
 
 	CreateBucket(bucketName string) error
 	ListBuckets() ([]models.S3Bucket, error)

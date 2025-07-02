@@ -83,6 +83,8 @@ func (s *ProvisioningService) DeleteResource(providerName, resourceType string, 
 		return provider.DeleteResource(resourceID)
 	case "storage":
 		return provider.DeleteBucket(resourceID)
+	case "network":
+		return provider.DeleteNetwork(resourceID)
 	default:
 		return fmt.Errorf("unsupported resource type: %s", resourceType)
 	}
@@ -128,6 +130,19 @@ func (s *ProvisioningService) ListResources(providerName string, resourceType st
 				Type:      "storage",
 				Provider:  providerName,
 				CreatedAt: *bucket.CreationDate,
+			})
+		}
+		return resources, nil
+	case "network":
+		networks, err := provider.ListNetworks()
+		if err != nil {
+			return nil, fmt.Errorf("failed to list network resources: %w", err)
+		}
+
+		var resources []models.ResourceMetadata
+		for _, network := range networks {
+			resources = append(resources, models.ResourceMetadata{
+				ID: network,
 			})
 		}
 		return resources, nil
